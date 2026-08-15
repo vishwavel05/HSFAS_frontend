@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  HindustanBadge40,
-  HindustanWordmark,
-} from "./HindustanBrandmark";
+import { HindustanLogo, HindustanBadge40 } from "./HindustanBrandmark";
 
 export function AppHeader({
   title,
@@ -34,14 +31,14 @@ export function AppHeader({
             </svg>
           </button>
         )}
-        <HindustanWordmark size="sm" />
+        <HindustanLogo className="h-12" />
         <div className="ml-auto">
-          <HindustanBadge40 />
+          <HindustanBadge40 className="h-12" />
         </div>
       </div>
       <div className="mt-5">
-        <h1 className="text-lg font-bold text-white">{title}</h1>
-        <p className="mt-0.5 text-[13px] text-white/70">{subtitle}</p>
+        <h1 className="text-2xl font-extrabold text-white">{title}</h1>
+        <p className="mt-1 text-sm text-white/70">{subtitle}</p>
       </div>
     </div>
   );

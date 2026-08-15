@@ -63,8 +63,9 @@ function StartAttendanceScreen() {
           description="Upload class photos from your device"
           buttonLabel="Choose Images"
           onTrigger={() => uploadInputRef.current?.click()}
+          variant="upload"
           icon={
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 16V4m0 0 4 4m-4-4-4 4"
                 stroke="currentColor"
@@ -99,8 +100,9 @@ function StartAttendanceScreen() {
           description="Capture photos using your device camera"
           buttonLabel="Open Camera"
           onTrigger={() => cameraInputRef.current?.click()}
+          variant="camera"
           icon={
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
               <path
                 d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-1.5h7L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9Z"
                 stroke="currentColor"
