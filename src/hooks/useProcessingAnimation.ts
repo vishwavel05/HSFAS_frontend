@@ -1,65 +1,118 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const PROCESSING_STAGES = [
-  "Uploading Images",
+  "Analyzing Images",
   "Detecting Faces",
-  "Generating Embeddings",
   "Matching Students",
   "Generating Attendance",
-  "Finalizing Results",
 ] as const;
 
 export type StageStatus = "completed" | "in_progress" | "pending";
 
-const STAGE_DURATION_MS = 10000;
-const FINAL_STAGE_INDEX = PROCESSING_STAGES.length - 1;
+// Target duration for the full visual progress sweep. This is a frontend
+// visualization only — the backend sends one final response after ~20s,
+// not per-stage updates. See AttendanceFlowContext.submitForProcessing.
+const DURATION_MS = 20000;
+
+// While waiting on the backend, the timer-driven progress is capped just
+// short of 100% so the UI never visually claims "done" before the actual
+// response arrives (per the "backend response is the source of truth"
+// requirement). Once the response *does* arrive, ACCELERATE_MS smoothly
+// closes the remaining gap instead of an abrupt jump to 100%.
+const WAITING_CAP = 99;
+const ACCELERATE_MS = 500;
+
+const STAGE_BOUNDS = [25, 50, 75, 100];
 
 /**
- * Drives the fixed 10s-per-stage animation described in the PRD.
+ * Drives the frontend-only processing visualization: a smooth 0-100%
+ * progress sweep over ~20s, mapped onto 4 stage indicators.
  *
- * BUG FIX (previous implementation): the progress animation used a single
- * `setInterval` started in an effect with an empty dependency array and no
- * cleanup that actually stopped a *previous* interval. Under React 18
- * StrictMode (which Next.js enables by default in dev), effects run
- * mount -> cleanup -> mount once on initial render; without a working
- * cleanup, that left two intervals ticking against the same state setter,
- * so stages advanced roughly twice as fast as intended and the final
- * "Finalizing Results" stage was sometimes skipped past entirely before
- * the backend had even responded.
+ * `isSuccess` reflects the *real* backend response (AttendanceFlowContext's
+ * processStatus === "success"), not a timer. Two cases:
+ *  - Backend is slower than the animation: progress holds at WAITING_CAP
+ *    and the final stage stays in the "in_progress" (spinner) state —
+ *    it never becomes "completed" from the timer alone.
+ *  - Backend responds before the animation finishes: remaining progress is
+ *    animated quickly (ACCELERATE_MS) up to 100% rather than jumping, then
+ *    the final stage flips to "completed".
  *
- * Fix: use `setTimeout` scheduled fresh from the *current* stage each time,
- * with a cancellation flag closed over by the effect's cleanup. Every
- * effect run is paired with a cleanup that cancels its own timer before
- * the next one is scheduled, so StrictMode's extra mount/cleanup pass
- * cannot leave a stray timer running.
+ * Uses requestAnimationFrame with cancellation captured in the effect's
+ * own closure (same pattern/reasoning as the previous setTimeout fix this
+ * hook replaces): every effect run's cleanup cancels its own frame before
+ * a new one is scheduled, so a React 18 StrictMode mount/cleanup/remount
+ * pass can't leave a stray animation loop running against stale state.
  */
-export function useProcessingAnimation(active: boolean) {
-  const [stageIndex, setStageIndex] = useState(0);
+export function useProcessingAnimation(active: boolean, isSuccess: boolean) {
+  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
+  const startRef = useRef<number | null>(null);
+  const accelRef = useRef<{ startTime: number; from: number } | null>(null);
 
   useEffect(() => {
     if (!active) return;
-    if (stageIndex >= FINAL_STAGE_INDEX) return; // final stage waits on the backend, not a timer
 
     let cancelled = false;
-    const timer = setTimeout(() => {
-      if (!cancelled) setStageIndex((i) => Math.min(i + 1, FINAL_STAGE_INDEX));
-    }, STAGE_DURATION_MS);
+    let rafId: number;
 
+    if (startRef.current === null) {
+      startRef.current = performance.now();
+    }
+
+    function tick(now: number) {
+      if (cancelled) return;
+
+      if (isSuccess) {
+        if (!accelRef.current) {
+          accelRef.current = { startTime: now, from: progressRef.current };
+        }
+        const { startTime, from } = accelRef.current;
+        const t = Math.min(1, (now - startTime) / ACCELERATE_MS);
+        const next = from + (100 - from) * t;
+        progressRef.current = next;
+        setProgress(next);
+        if (t < 1) {
+          rafId = requestAnimationFrame(tick);
+        }
+        return;
+      }
+
+      const elapsed = now - (startRef.current ?? now);
+      const next = Math.min(WAITING_CAP, (elapsed / DURATION_MS) * 100);
+      progressRef.current = next;
+      setProgress(next);
+      if (next < WAITING_CAP) {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    rafId = requestAnimationFrame(tick);
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      cancelAnimationFrame(rafId);
     };
-  }, [active, stageIndex]);
+  }, [active, isSuccess]);
 
   const stageStatuses: StageStatus[] = PROCESSING_STAGES.map((_, i) => {
-    if (i < stageIndex) return "completed";
-    if (i === stageIndex) return "in_progress";
+    const lower = i === 0 ? 0 : STAGE_BOUNDS[i - 1];
+    const upper = STAGE_BOUNDS[i];
+    const isLastStage = i === PROCESSING_STAGES.length - 1;
+
+    if (progress >= upper) {
+      // The final stage only ever shows "completed" once the real backend
+      // response has arrived — reaching 100% via the timer alone (capped
+      // at WAITING_CAP, so this only happens post-acceleration) always
+      // coincides with isSuccess being true by construction.
+      if (isLastStage) return isSuccess ? "completed" : "in_progress";
+      return "completed";
+    }
+    if (progress >= lower) return "in_progress";
     return "pending";
   });
 
   return {
-    stageIndex,
+    progress,
     stageStatuses,
-    hasReachedFinalStage: stageIndex === FINAL_STAGE_INDEX,
+    hasReachedFinalStage: progress >= 100,
   };
 }
