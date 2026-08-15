@@ -17,15 +17,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={id}
-            className="mb-1.5 block text-sm font-medium text-navy"
+            className="mb-1 block text-sm font-bold text-navy"
           >
             {label}
           </label>
         )}
         <div
           className={cx(
-            "flex items-center gap-2.5 rounded-xl border bg-white px-3.5 py-3",
-            error ? "border-danger" : "border-surface-border focus-within:border-brand-blue"
+            "flex items-center gap-2.5 rounded-2xl border bg-white px-4 py-2.5 transition-colors",
+            error
+              ? "border-danger"
+              : "border-surface-border focus-within:border-brand-blue"
           )}
         >
           {icon && <span className="text-surface-muted shrink-0">{icon}</span>}

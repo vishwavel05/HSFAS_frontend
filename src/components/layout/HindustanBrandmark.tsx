@@ -1,11 +1,47 @@
-export function HindustanBadge40() {
+/**
+ * Complete Hindustan branding lockup — emblem, wordmark, and sub-lines are
+ * all baked into the single asset at /assets/hindustan-logo.png.
+ * Do not pair this with <HindustanWordmark /> or it will duplicate the text.
+ *
+ * Rendered with a plain <img> (not next/image) so the browser can use the
+ * file's own intrinsic aspect ratio — its exact pixel dimensions weren't
+ * provided, so a fixed width/height here could distort it.
+ */
+export function HindustanLogo({
+  className = "h-11",
+}: {
+  className?: string;
+}) {
   return (
-    <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gold text-gold">
-      <span className="text-[11px] font-bold">40</span>
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/assets/hindustan-logo.png"
+      alt="Hindustan Institute of Technology & Science (Deemed to be University)"
+      className={`w-auto shrink-0 object-contain ${className}`}
+    />
   );
 }
 
+export function HindustanBadge40({
+  className = "h-16",
+}: {
+  className?: string;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/assets/hindustan-40-badge.png"
+      alt="40 Years of Excellence in Education"
+      className={`w-auto shrink-0 object-contain ${className}`}
+    />
+  );
+}
+
+/**
+ * Kept for backward compatibility in case other screens still use the
+ * text-only wordmark. Not used on the login screen anymore now that
+ * hindustan-logo.png provides the complete branding lockup.
+ */
 export function HindustanWordmark({
   size = "sm",
 }: {
@@ -17,7 +53,7 @@ export function HindustanWordmark({
       <p
         className={
           isLg
-            ? "text-2xl font-extrabold tracking-tight text-white"
+            ? "text-[26px] font-extrabold tracking-tight text-white"
             : "text-[15px] font-extrabold tracking-tight text-white"
         }
       >
@@ -26,7 +62,7 @@ export function HindustanWordmark({
       <p
         className={
           isLg
-            ? "mt-0.5 text-[10px] font-medium tracking-wide text-white/70"
+            ? "mt-1 text-[10px] font-medium tracking-wide text-white/70"
             : "text-[6.5px] font-medium tracking-wide text-white/70"
         }
       >

@@ -14,7 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-brand-blue text-white hover:bg-brand-blue-dark active:bg-brand-blue-dark disabled:bg-blue-300",
+    "bg-gradient-to-b from-brand-blue to-brand-blue-dark text-white shadow-lg shadow-brand-blue/40 hover:shadow-brand-blue/50 active:from-brand-blue-dark active:to-brand-blue-dark disabled:from-blue-300 disabled:to-blue-300 disabled:shadow-none",
   secondary:
     "bg-navy text-white hover:bg-navy-light disabled:bg-navy/40",
   outline:
@@ -41,7 +41,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cx(
-          "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-[15px] font-semibold transition-colors duration-150 disabled:cursor-not-allowed",
+          "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[15px] font-semibold transition-all duration-150 disabled:cursor-not-allowed",
           fullWidth && "w-full",
           variantClasses[variant],
           className
