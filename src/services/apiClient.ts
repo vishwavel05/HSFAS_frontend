@@ -31,6 +31,59 @@ export function clearStoredToken() {
   window.sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
 }
 
+// ---------------------------------------------------------------------------
+// Faculty identity storage
+// ---------------------------------------------------------------------------
+// api_documentation.md's login endpoint returns {faculty_id, full_name,
+// department} and no token/session field, and every other endpoint takes
+// faculty_id as a plain query/body value rather than reading it from an
+// auth header. So "being logged in" here means "we have a persisted
+// faculty_id", not "we have a valid bearer token" — this is a separate,
+// explicitly-named concern from the (currently unused) token helpers
+// above, which are left in place only in case real token auth is added
+// to the backend later.
+const FACULTY_STORAGE_KEY = "hsfas_faculty_identity";
+
+export interface StoredFacultyIdentity {
+  facultyId: string;
+  fullName: string;
+  department: string;
+}
+
+export function getStoredFacultyIdentity(): StoredFacultyIdentity | null {
+  if (typeof window === "undefined") return null;
+  const raw =
+    window.localStorage.getItem(FACULTY_STORAGE_KEY) ??
+    window.sessionStorage.getItem(FACULTY_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as StoredFacultyIdentity;
+  } catch {
+    return null;
+  }
+}
+
+export function storeFacultyIdentity(
+  identity: StoredFacultyIdentity,
+  persist: boolean
+) {
+  if (typeof window === "undefined") return;
+  const raw = JSON.stringify(identity);
+  if (persist) {
+    window.localStorage.setItem(FACULTY_STORAGE_KEY, raw);
+    window.sessionStorage.removeItem(FACULTY_STORAGE_KEY);
+  } else {
+    window.sessionStorage.setItem(FACULTY_STORAGE_KEY, raw);
+    window.localStorage.removeItem(FACULTY_STORAGE_KEY);
+  }
+}
+
+export function clearStoredFacultyIdentity() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(FACULTY_STORAGE_KEY);
+  window.sessionStorage.removeItem(FACULTY_STORAGE_KEY);
+}
+
 /**
  * Normalized error shape used throughout the app so every screen can
  * render a real, specific message instead of a swallowed/opaque error.
@@ -70,6 +123,12 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
+  // Currently a no-op in practice: api_documentation.md's login endpoint
+  // returns no token, so nothing is ever written under
+  // AUTH_TOKEN_STORAGE_KEY by the real login flow (see
+  // storeFacultyIdentity below for what actually persists a session).
+  // Left in place rather than removed, in case token-based auth is added
+  // to the backend later.
   const token = getStoredToken();
   if (token) {
     config.headers = config.headers ?? new AxiosHeaders();

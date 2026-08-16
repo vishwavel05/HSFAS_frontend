@@ -24,11 +24,22 @@ import type {
 export const MAX_IMAGES = 5;
 export const MIN_IMAGES = 1;
 
-export interface AttendanceScope {
-  department: string;
-  year: string;
-  section: string;
-  threshold?: number;
+/**
+ * What's carried forward from the Timetable screen into the attendance
+ * flow. `timetableSlotId` and `date` are the two fields POST
+ * /api/attendance/ actually requires; the rest (course/time labels) are
+ * kept only for display — e.g. the confirmation banner on Start
+ * Attendance — and are never sent to the processing endpoint themselves.
+ */
+export interface SelectedTimetableSlot {
+  timetableSlotId: number;
+  date: string;
+  courseCode?: string;
+  courseName?: string;
+  time?: string;
+  department?: string;
+  year?: string;
+  section?: string;
 }
 
 interface PickedImage {
@@ -43,8 +54,8 @@ interface AttendanceFlowContextValue {
   removeImage: (index: number) => void;
   clearImages: () => void;
 
-  scope: AttendanceScope;
-  setScope: (scope: AttendanceScope) => void;
+  selectedSlot: SelectedTimetableSlot | null;
+  setSelectedSlot: (slot: SelectedTimetableSlot | null) => void;
 
   // --- Step 3 -> 4: submit for processing ---
   submitForProcessing: () => void;
@@ -78,11 +89,9 @@ export function AttendanceFlowProvider({
   children: React.ReactNode;
 }) {
   const [images, setImages] = useState<PickedImage[]>([]);
-  const [scope, setScope] = useState<AttendanceScope>({
-    department: "",
-    year: "",
-    section: "",
-  });
+  const [selectedSlot, setSelectedSlot] = useState<SelectedTimetableSlot | null>(
+    null
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [pendingCorrections, setPendingCorrections] = useState<
     Map<number, AttendanceStatus>
@@ -150,24 +159,27 @@ export function AttendanceFlowProvider({
   });
 
   const submitForProcessing = useCallback(() => {
+    if (!selectedSlot) {
+      // Shouldn't happen in normal flow — Start Attendance redirects to
+      // /timetable if no slot is selected — but guards against a stray
+      // call (e.g. context misuse) silently sending a malformed request.
+      return;
+    }
     processMutation.mutate({
       images: images.map((i) => i.file),
-      department: scope.department,
-      year: scope.year,
-      section: scope.section,
-      threshold: scope.threshold,
+      timetableSlotId: selectedSlot.timetableSlotId,
+      date: selectedSlot.date,
     });
-  }, [images, scope, processMutation]);
+  }, [images, selectedSlot, processMutation]);
 
   const retryProcessing = useCallback(() => {
+    if (!selectedSlot) return;
     processMutation.mutate({
       images: images.map((i) => i.file),
-      department: scope.department,
-      year: scope.year,
-      section: scope.section,
-      threshold: scope.threshold,
+      timetableSlotId: selectedSlot.timetableSlotId,
+      date: selectedSlot.date,
     });
-  }, [images, scope, processMutation]);
+  }, [images, selectedSlot, processMutation]);
 
   const processError =
     processMutation.error instanceof ApiError
@@ -246,7 +258,7 @@ export function AttendanceFlowProvider({
 
   const resetFlow = useCallback(() => {
     clearImages();
-    setScope({ department: "", year: "", section: "" });
+    setSelectedSlot(null);
     processMutation.reset();
     updateMutation.reset();
     setPendingCorrections(new Map());
@@ -265,8 +277,8 @@ export function AttendanceFlowProvider({
     addImages,
     removeImage,
     clearImages,
-    scope,
-    setScope,
+    selectedSlot,
+    setSelectedSlot,
     submitForProcessing,
     processStatus: processMutation.status,
     processError,

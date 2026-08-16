@@ -4,18 +4,26 @@ export interface LoginCredentials {
   rememberMe: boolean;
 }
 
+/**
+ * Faculty identity kept in app state after login. Field names are
+ * frontend-style (camelCase); see LoginResponse below for the raw
+ * snake_case shape the API actually returns.
+ */
 export interface AuthUser {
-  username: string;
-  displayName?: string;
+  facultyId: string;
+  fullName: string;
+  department: string;
 }
 
 /**
- * Shape this app expects back from the configured auth endpoint.
- * The backend README (Backend_final.md) does not document an auth API,
- * so this is the app's own contract — adjust to match your Django
- * auth view's real response if it differs.
+ * Exact shape of POST /api/auth/login/'s success response per
+ * api_documentation.md. No token/session field is documented — every
+ * other endpoint takes `faculty_id` as a plain query/body value instead
+ * of an auth header, so there is nothing to store as a bearer token today.
  */
 export interface LoginResponse {
-  token: string;
-  user?: AuthUser;
+  success: true;
+  faculty_id: string;
+  full_name: string;
+  department: string;
 }

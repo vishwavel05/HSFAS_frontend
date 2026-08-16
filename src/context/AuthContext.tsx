@@ -12,9 +12,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { login as loginRequest } from "@/services/authService";
 import {
-  clearStoredToken,
-  getStoredToken,
-  storeToken,
+  clearStoredFacultyIdentity,
+  getStoredFacultyIdentity,
+  storeFacultyIdentity,
 } from "@/services/apiClient";
 import { ApiError } from "@/services/apiClient";
 import type { AuthUser, LoginCredentials } from "@/types/auth";
@@ -23,14 +23,20 @@ import type { AuthUser, LoginCredentials } from "@/types/auth";
 // DEMO MODE
 // ---------------------------------------------------------------------------
 // While true, Sign In never calls the backend login endpoint. Instead:
-//   - username "admin" + password "admin" logs in locally.
+//   - username "admin" + password "admin" logs in locally as faculty_id
+//     "F101" (matching the worked example in api_documentation.md), so
+//     downstream Timetable/History calls have a real faculty_id to query.
 //   - any other credentials show "Invalid credentials".
 // To restore real backend authentication after the demo, set this to false
 // (or delete the DEMO MODE block below). No other file needs to change.
 const DEMO_MODE = true;
 const DEMO_USERNAME = "admin";
 const DEMO_PASSWORD = "admin";
-const DEMO_TOKEN = "demo-local-token";
+const DEMO_FACULTY: AuthUser = {
+  facultyId: "F101",
+  fullName: "Demo Faculty",
+  department: "CSE",
+};
 // ---------------------------------------------------------------------------
 
 interface AuthContextValue {
@@ -57,12 +63,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [demoLoginError, setDemoLoginError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Hydrate "is signed in" purely from token presence; the backend
-    // doesn't document a /me or token-verify endpoint to fetch user
-    // details from, so username is only known right after a fresh login.
-    const token = getStoredToken();
-    if (token) {
-      setUser((current) => current ?? { username: "" });
+    // Hydrate "is signed in" from the persisted faculty identity (see
+    // apiClient's storeFacultyIdentity) — the documented login response
+    // has no token/session field, so faculty_id + name + department *is*
+    // the session as far as this app is concerned.
+    const stored = getStoredFacultyIdentity();
+    if (stored) {
+      setUser({
+        facultyId: stored.facultyId,
+        fullName: stored.fullName,
+        department: stored.department,
+      });
     }
     setIsHydrated(true);
   }, []);
@@ -70,9 +81,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const mutation = useMutation({
     mutationFn: loginRequest,
     onSuccess: (data, variables) => {
-      storeToken(data.token, variables.rememberMe);
-      setUser(data.user ?? { username: variables.username });
-      router.push("/start-attendance");
+      const identity: AuthUser = {
+        facultyId: data.faculty_id,
+        fullName: data.full_name,
+        department: data.department,
+      };
+      storeFacultyIdentity(identity, variables.rememberMe);
+      setUser(identity);
+      router.push("/timetable");
     },
   });
 
@@ -89,9 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           credentials.username === DEMO_USERNAME &&
           credentials.password === DEMO_PASSWORD
         ) {
-          storeToken(DEMO_TOKEN, credentials.rememberMe);
-          setUser({ username: credentials.username });
-          router.push("/start-attendance");
+          storeFacultyIdentity(DEMO_FACULTY, credentials.rememberMe);
+          setUser(DEMO_FACULTY);
+          router.push("/timetable");
         } else {
           setDemoLoginError("Invalid credentials");
         }
@@ -107,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(() => {
-    clearStoredToken();
+    clearStoredFacultyIdentity();
     setUser(null);
     router.push("/login");
   }, [router]);

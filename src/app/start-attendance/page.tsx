@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -18,10 +18,22 @@ const INSTRUCTIONS = [
 
 function StartAttendanceScreen() {
   const router = useRouter();
-  const { addImages, images } = useAttendanceFlow();
+  const { addImages, images, selectedSlot } = useAttendanceFlow();
   const [warning, setWarning] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Guard: this screen now depends on a timetable period having been
+  // selected (that's where timetable_slot_id + date come from, both
+  // required by POST /api/attendance/). Arriving here without one — e.g.
+  // a direct link, or a hard refresh that dropped in-memory context state
+  // — sends the faculty back to pick a period instead of letting them
+  // capture images that can never be submitted.
+  useEffect(() => {
+    if (!selectedSlot) {
+      router.replace("/timetable");
+    }
+  }, [selectedSlot, router]);
 
   function handleFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
@@ -43,15 +55,35 @@ function StartAttendanceScreen() {
     }
   }
 
+  if (!selectedSlot) {
+    return null;
+  }
+
   return (
     <div className="flex flex-1 flex-col bg-surface">
       <AppHeader
         title="Start Attendance"
         subtitle="Choose a method to capture images"
-        onBack={() => router.push("/login")}
+        onBack={() => router.push("/timetable")}
       />
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+        {/* Confirms which timetable period this session is tied to, since
+            department/year/section are no longer manually selected here —
+            they (and timetable_slot_id/date) come entirely from the
+            period picked on the Timetable screen. */}
+        <div className="rounded-xl border border-brand-blue/30 bg-brand-blue-light px-4 py-3 text-sm text-navy">
+          <span className="font-semibold">
+            {selectedSlot.courseCode ?? "Selected class"}
+          </span>
+          {selectedSlot.courseName && ` · ${selectedSlot.courseName}`}
+          {selectedSlot.time && (
+            <span className="block text-xs text-navy/70">
+              {selectedSlot.time}
+            </span>
+          )}
+        </div>
+
         {warning && (
           <div className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-navy">
             {warning}

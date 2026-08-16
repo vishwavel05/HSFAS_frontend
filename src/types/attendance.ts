@@ -32,11 +32,9 @@ export interface AttendanceResponse {
 
 export interface ProcessAttendancePayload {
   images: File[];
-  department: string;
-  year: string;
-  section: string;
+  timetableSlotId: number;
+  date: string;
   threshold?: number;
-  debug?: boolean;
 }
 
 export interface AttendanceUpdateEntry {

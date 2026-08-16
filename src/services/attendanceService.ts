@@ -8,22 +8,21 @@ import type {
 
 /**
  * POST /api/attendance/  (multipart/form-data)
- * Fields per Backend_final.md: images (1-5, repeated), department, year,
- * section, threshold (optional), debug (optional).
+ * Fields per api_documentation.md: images (1-5, repeated),
+ * timetable_slot_id (required), date (required, YYYY-MM-DD), threshold
+ * (optional). There is no department/year/section/debug field in the
+ * documented request — the backend resolves class context server-side
+ * from timetable_slot_id.
  */
 export async function processAttendance(
   payload: ProcessAttendancePayload
 ): Promise<AttendanceResponse> {
   const formData = new FormData();
   payload.images.forEach((file) => formData.append("images", file));
-  formData.append("department", payload.department);
-  formData.append("year", payload.year);
-  formData.append("section", payload.section);
+  formData.append("timetable_slot_id", String(payload.timetableSlotId));
+  formData.append("date", payload.date);
   if (payload.threshold !== undefined) {
     formData.append("threshold", String(payload.threshold));
-  }
-  if (payload.debug) {
-    formData.append("debug", "true");
   }
 
   const response = await apiClient.post<AttendanceResponse>(
