@@ -29,7 +29,7 @@ import type { AuthUser, LoginCredentials } from "@/types/auth";
 //   - any other credentials show "Invalid credentials".
 // To restore real backend authentication after the demo, set this to false
 // (or delete the DEMO MODE block below). No other file needs to change.
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 const DEMO_USERNAME = "admin";
 const DEMO_PASSWORD = "admin";
 const DEMO_FACULTY: AuthUser = {
