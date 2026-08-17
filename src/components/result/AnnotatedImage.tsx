@@ -12,6 +12,8 @@ export function AnnotatedImage({ images }: { images: string[] }) {
   const [zoom, setZoom] = useState(1);
   const pinchStartDistance = useRef<number | null>(null);
   const pinchStartZoom = useRef(1);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const isPinching = useRef(false);
 
   function openLightbox() {
     setZoom(1);
@@ -35,6 +37,16 @@ export function AnnotatedImage({ images }: { images: string[] }) {
     setZoom((z) => (z > 1 ? 1 : 2));
   }
 
+  function goToPrev() {
+    setIndex((i) => Math.max(0, i - 1));
+    setZoom(1);
+  }
+
+  function goToNext() {
+    setIndex((i) => Math.min(images.length - 1, i + 1));
+    setZoom(1);
+  }
+
   function touchDistance(touches: React.TouchList) {
     const [a, b] = [touches[0], touches[1]];
     return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
@@ -42,8 +54,20 @@ export function AnnotatedImage({ images }: { images: string[] }) {
 
   function handleTouchStart(e: React.TouchEvent) {
     if (e.touches.length === 2) {
+      isPinching.current = true;
+      swipeStart.current = null;
       pinchStartDistance.current = touchDistance(e.touches);
       pinchStartZoom.current = zoom;
+      return;
+    }
+    if (e.touches.length === 1 && zoom <= 1) {
+      // Only treat as a potential swipe when not zoomed in — at zoom > 1
+      // a single finger should pan the image via native scroll instead.
+      isPinching.current = false;
+      swipeStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
     }
   }
 
@@ -64,6 +88,23 @@ export function AnnotatedImage({ images }: { images: string[] }) {
     if (e.touches.length < 2) {
       pinchStartDistance.current = null;
     }
+
+    if (!isPinching.current && swipeStart.current && e.changedTouches.length === 1) {
+      const dx = e.changedTouches[0].clientX - swipeStart.current.x;
+      const dy = e.changedTouches[0].clientY - swipeStart.current.y;
+      const SWIPE_THRESHOLD = 50;
+      // Require a mostly-horizontal gesture so vertical scrolling/panning
+      // doesn't get misread as a page change.
+      if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) {
+          goToNext(); // swipe left -> next image
+        } else {
+          goToPrev(); // swipe right -> previous image
+        }
+      }
+    }
+    swipeStart.current = null;
+    isPinching.current = false;
   }
 
   if (images.length === 0) {
@@ -180,6 +221,35 @@ export function AnnotatedImage({ images }: { images: string[] }) {
                 draggable={false}
               />
             </div>
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrev();
+                  }}
+                  disabled={index === 0}
+                  aria-label="Previous image"
+                  className="fixed left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-white/10"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNext();
+                  }}
+                  disabled={index === images.length - 1}
+                  aria-label="Next image"
+                  className="fixed right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-white/10"
+                >
+                  ›
+                </button>
+              </>
+            )}
           </div>
 
           <div
