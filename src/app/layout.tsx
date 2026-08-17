@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="font-sans">
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <Providers>
           <div className="min-h-screen w-full sm:max-w-shell sm:min-h-[820px] sm:my-0 bg-surface sm:rounded-[28px] sm:overflow-hidden sm:shadow-card-lg flex flex-col">
             {children}

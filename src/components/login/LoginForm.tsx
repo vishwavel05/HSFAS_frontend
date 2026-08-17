@@ -23,7 +23,7 @@ export function LoginForm() {
       return;
     }
     setValidationError(null);
-    login({ username: username.trim(), password, rememberMe });
+    login({ username: username.trim(), password: password.trim(), rememberMe });
   }
 
   return (
