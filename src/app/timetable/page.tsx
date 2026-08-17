@@ -40,6 +40,22 @@ function ChevronIcon() {
   );
 }
 
+/**
+ * Builds the "CSE 7C"-style class label from the timetable API's
+ * target_department/target_year/target_section fields (per
+ * api_documentation.md — these are only present on occupied periods,
+ * omitted on free/locked ones). Concatenates whatever pieces exist as-is
+ * (no ordinal formatting — "7" stays "7", matching the documented example
+ * exactly) so a partially-populated slot still shows something reasonable
+ * instead of blank text.
+ */
+function formatClassLabel(slot: TimetableSlot): string | null {
+  const parts = [slot.target_department, slot.target_year, slot.target_section]
+    .filter((p): p is string => !!p && p.trim().length > 0);
+  if (parts.length === 0) return null;
+  return parts.join(" ");
+}
+
 function TimetableRow({
   slot,
   onSelect,
@@ -51,6 +67,7 @@ function TimetableRow({
   const isCompleted = slot.status === "Completed";
 
   const numberBadgeClass = isCompleted || isPending ? "bg-success" : "bg-surface-border text-surface-muted";
+  const classLabel = formatClassLabel(slot);
 
   const content = (
     <div
@@ -71,10 +88,10 @@ function TimetableRow({
         <p
           className={cx(
             "truncate text-sm font-bold",
-            slot.course_code ? "text-navy" : "text-surface-muted"
+            classLabel ? "text-navy" : "text-surface-muted"
           )}
         >
-          {slot.course_code ?? "—"}
+          {classLabel ?? "—"}
         </p>
         <p className="text-xs text-surface-muted">{slot.time}</p>
       </div>
@@ -140,7 +157,9 @@ function TimetableScreen() {
   return (
     <div className="flex flex-1 flex-col bg-surface">
       <AppHeader
-        title={`${getGreeting()}, ${user?.fullName?.split(" ")[0] ?? "Faculty"}! 👋`}
+        title={`${getGreeting()}, ${
+          user?.fullName?.split(" ")[0] ?? "Faculty"
+        } Ma'am! 👋`}
         subtitle="Here's your class schedule for today."
         menu={{
           onHistory: () => router.push("/history"),
