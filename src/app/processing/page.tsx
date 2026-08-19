@@ -65,7 +65,7 @@ function ProcessingScreen() {
         subtitle="Please wait while we process the images"
       />
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div className="flex-1 space-y-4 px-5 py-5">
         <Card className="px-5 py-6">
           <ProcessingTimeline progress={progress} statuses={stageStatuses} />
         </Card>

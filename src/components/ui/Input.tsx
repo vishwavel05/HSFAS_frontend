@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={id}
             className={cx(
-              "w-full bg-transparent text-[15px] text-navy placeholder:text-surface-muted outline-none",
+              "w-full min-w-0 bg-transparent text-[15px] text-navy placeholder:text-surface-muted outline-none",
               className
             )}
             {...rest}

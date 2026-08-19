@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { resolveMediaUrl } from "@/services/attendanceService";
 
 const MIN_ZOOM = 1;
@@ -19,6 +19,16 @@ export function AnnotatedImage({ images }: { images: string[] }) {
     setZoom(1);
     setLightboxOpen(true);
   }
+
+  useEffect(() => {
+    if (lightboxOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [lightboxOpen]);
 
   function closeLightbox() {
     setLightboxOpen(false);
@@ -202,7 +212,7 @@ export function AnnotatedImage({ images }: { images: string[] }) {
           </div>
 
           <div
-            className="relative flex-1 overflow-auto"
+            className="relative flex-1 overflow-auto overscroll-contain touch-pan-x touch-pan-y"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}

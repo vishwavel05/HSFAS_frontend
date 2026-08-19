@@ -14,6 +14,7 @@ import {
   processAttendance,
   updateAttendance,
 } from "@/services/attendanceService";
+import { toast } from "react-hot-toast";
 import { ApiError } from "@/services/apiClient";
 import type {
   AttendanceRecord,
@@ -192,26 +193,70 @@ export function AttendanceFlowProvider({
   const result = processMutation.data ?? null;
 
   const toggleStatus = useCallback((studentId: number) => {
+    const record = result?.attendance.find((r) => r.student_id === studentId);
+    if (!record) return;
+
+    const currentlyPending = pendingCorrections.get(studentId);
+    const currentEffectiveStatus = currentlyPending || record.status;
+    const newStatus = currentEffectiveStatus === "present" ? "absent" : "present";
+
+    if (newStatus === "present") {
+      toast.custom(
+        (t) => (
+          <div
+            className={`${
+              t.visible ? "animate-enter" : "animate-leave"
+            } pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl bg-success-light px-4 py-3 shadow-card-lg`}
+          >
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success text-white">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M20 6L9 17L4 12"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <p className="flex-1 text-sm text-black">
+              <span className="font-extrabold uppercase">{record.display_name}</span> has been marked present.
+            </p>
+            <button
+              type="button"
+              onClick={() => toast.dismiss(t.id)}
+              className="flex shrink-0 items-center justify-center text-success hover:opacity-75"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        ),
+        {
+          id: `toast-present-${studentId}`,
+          duration: 3000,
+          position: "bottom-center",
+        }
+      );
+    }
+
     setPendingCorrections((current) => {
       const next = new Map(current);
-      const record = result?.attendance.find(
-        (r) => r.student_id === studentId
-      );
-      if (!record) return current;
-
-      const currentlyPending = next.get(studentId);
-      if (currentlyPending) {
-        // second toggle returns to original -> drop the pending correction
+      if (current.has(studentId)) {
         next.delete(studentId);
       } else {
-        const flipped: AttendanceStatus =
-          record.status === "present" ? "absent" : "present";
-        next.set(studentId, flipped);
+        next.set(studentId, newStatus);
       }
       return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result]);
+  }, [result, pendingCorrections]);
 
   const cancelChanges = useCallback(() => {
     setPendingCorrections(new Map());
@@ -232,11 +277,12 @@ export function AttendanceFlowProvider({
   });
 
   const saveAttendance = useCallback(() => {
-    if (pendingCorrections.size === 0) {
+    if (pendingCorrections.size === 0 || !result) {
       setIsEditing(false);
       return;
     }
     const payload = {
+      session_id: result.session_id,
       attendance: Array.from(pendingCorrections.entries()).map(
         ([student_id, status]) => ({ student_id, status })
       ),

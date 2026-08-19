@@ -169,45 +169,49 @@ function HistoryScreen() {
 
         {data && (
           <>
-            <Card className="px-4 py-4">
+            <Card className="overflow-hidden px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-surface-muted">
                 Date Range
               </p>
               <div className="mt-1.5 flex items-center gap-2">
-                <Input
-                  type="date"
-                  aria-label="From date"
-                  value={dateFrom}
-                  onChange={(e) =>
-                    handleFilterChange(setDateFrom, e.target.value)
-                  }
-                />
-                <span className="text-sm text-surface-muted">to</span>
-                <Input
-                  type="date"
-                  aria-label="To date"
-                  value={dateTo}
-                  onChange={(e) =>
-                    handleFilterChange(setDateTo, e.target.value)
-                  }
-                />
+                <div className="min-w-0 flex-1">
+                  <Input
+                    type="date"
+                    aria-label="From date"
+                    value={dateFrom}
+                    onChange={(e) =>
+                      handleFilterChange(setDateFrom, e.target.value)
+                    }
+                  />
+                </div>
+                <span className="shrink-0 text-sm text-surface-muted">to</span>
+                <div className="min-w-0 flex-1">
+                  <Input
+                    type="date"
+                    aria-label="To date"
+                    value={dateTo}
+                    onChange={(e) =>
+                      handleFilterChange(setDateTo, e.target.value)
+                    }
+                  />
+                </div>
               </div>
 
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-surface-muted">
+                <div className="min-w-0">
+                  <label className="mb-1 block truncate text-xs font-medium text-surface-muted">
                     Class Type
                   </label>
                   <select
                     disabled
                     title="Not available from the current API response"
-                    className="w-full cursor-not-allowed appearance-none rounded-lg border border-surface-border bg-surface px-2.5 py-2 text-sm font-medium text-surface-muted outline-none"
+                    className="w-full min-w-0 cursor-not-allowed appearance-none truncate rounded-lg border border-surface-border bg-surface px-2.5 py-2 text-sm font-medium text-surface-muted outline-none"
                   >
                     <option>All</option>
                   </select>
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-surface-muted">
+                <div className="min-w-0">
+                  <label className="mb-1 block truncate text-xs font-medium text-surface-muted">
                     Status
                   </label>
                   <select
@@ -215,7 +219,7 @@ function HistoryScreen() {
                     onChange={(e) =>
                       handleFilterChange(setStatusFilter, e.target.value)
                     }
-                    className="w-full appearance-none rounded-lg border border-surface-border bg-white px-2.5 py-2 text-sm font-medium text-navy outline-none focus:border-brand-blue"
+                    className="w-full min-w-0 appearance-none truncate rounded-lg border border-surface-border bg-white px-2.5 py-2 text-sm font-medium text-navy outline-none focus:border-brand-blue"
                   >
                     {statusOptions.map((s) => (
                       <option key={s} value={s}>
@@ -224,8 +228,8 @@ function HistoryScreen() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-surface-muted">
+                <div className="min-w-0">
+                  <label className="mb-1 block truncate text-xs font-medium text-surface-muted">
                     Course
                   </label>
                   <select
@@ -233,7 +237,7 @@ function HistoryScreen() {
                     onChange={(e) =>
                       handleFilterChange(setCourseFilter, e.target.value)
                     }
-                    className="w-full appearance-none rounded-lg border border-surface-border bg-white px-2.5 py-2 text-sm font-medium text-navy outline-none focus:border-brand-blue"
+                    className="w-full min-w-0 appearance-none truncate rounded-lg border border-surface-border bg-white px-2.5 py-2 text-sm font-medium text-navy outline-none focus:border-brand-blue"
                   >
                     {courseOptions.map((c) => (
                       <option key={c} value={c}>

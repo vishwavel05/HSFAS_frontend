@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans" suppressHydrationWarning>
         <Providers>
-          <div className="min-h-screen w-full sm:max-w-shell sm:min-h-[820px] sm:my-0 bg-surface sm:rounded-[28px] sm:overflow-hidden sm:shadow-card-lg flex flex-col">
+          <div className="grid grid-rows-[1fr] min-h-screen w-full bg-surface sm:max-w-shell sm:min-h-[820px] sm:my-0 sm:rounded-[28px] sm:overflow-hidden sm:shadow-card-lg">
             {children}
           </div>
         </Providers>

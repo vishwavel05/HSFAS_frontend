@@ -157,9 +157,12 @@ function TimetableScreen() {
   return (
     <div className="flex flex-1 flex-col bg-surface">
       <AppHeader
-        title={`${getGreeting()}, ${
-          user?.fullName?.split(" ")[0] ?? "Faculty"
-        } Ma'am! 👋`}
+        title={
+          <>
+            {getGreeting()},<br />
+            {user?.fullName?.split(" ")[0] ?? "Faculty"} Ma&apos;am! 👋
+          </>
+        }
         subtitle="Here's your class schedule for today."
         menu={{
           onHistory: () => router.push("/history"),
@@ -167,7 +170,7 @@ function TimetableScreen() {
         }}
       />
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div className="flex-1 space-y-4 px-5 py-5">
         {isLoading && (
           <div className="flex items-center justify-center py-10">
             <LoadingSpinner size={28} className="text-navy" />

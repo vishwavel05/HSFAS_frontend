@@ -67,7 +67,7 @@ function StartAttendanceScreen() {
         onBack={() => router.push("/timetable")}
       />
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div className="flex-1 space-y-4 px-5 py-5">
         {/* Confirms which timetable period this session is tied to, since
             department/year/section are no longer manually selected here —
             they (and timetable_slot_id/date) come entirely from the

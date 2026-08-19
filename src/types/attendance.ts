@@ -25,6 +25,7 @@ export interface AttendanceSummary {
 }
 
 export interface AttendanceResponse {
+  session_id: number;
   summary: AttendanceSummary;
   attendance: AttendanceRecord[];
   annotated_images: string[];
@@ -43,6 +44,7 @@ export interface AttendanceUpdateEntry {
 }
 
 export interface AttendanceUpdatePayload {
+  session_id: number;
   attendance: AttendanceUpdateEntry[];
 }
 

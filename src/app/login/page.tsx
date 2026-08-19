@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-1 flex-col bg-navy">
       {/* Decorative background: gradient glow + top-right swoosh */}
-      <div className="relative overflow-hidden">
+      <div className="relative shrink-0 overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0"
           style={{

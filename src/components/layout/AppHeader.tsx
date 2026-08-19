@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { HindustanLogo, HindustanBadge40 } from "./HindustanBrandmark";
 
 interface AccountMenu {
@@ -14,8 +14,8 @@ export function AppHeader({
   onBack,
   menu,
 }: {
-  title: string;
-  subtitle: string;
+  title: ReactNode;
+  subtitle: ReactNode;
   onBack?: () => void;
   /**
    * Optional History/Logout dropdown, shown as a vertical three-dot
@@ -28,7 +28,7 @@ export function AppHeader({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="bg-navy px-5 pb-5 pt-4">
+    <div className="sticky top-0 z-50 bg-navy px-5 pb-5 pt-4 shadow-sm">
       <div className="flex items-center gap-3">
         {onBack && (
           <button

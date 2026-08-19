@@ -60,7 +60,7 @@ function ResultScreen() {
         onBack={handleStartNewSession}
       />
 
-      <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
+      <div className="flex-1 space-y-5 px-5 py-5">
         <SummaryCards present={presentCount} absent={absentCount} />
 
         <AnnotatedImage images={result.annotated_images} />
@@ -89,23 +89,29 @@ function ResultScreen() {
       </div>
 
       <div className="flex gap-3 px-5 pb-5">
+        {hasPendingChanges && (
+          <Button
+            variant="outline"
+            fullWidth={false}
+            className="flex-1"
+            onClick={cancelChanges}
+          >
+            Cancel
+          </Button>
+        )}
         <Button
-          variant="outline"
           fullWidth={false}
           className="flex-1"
-          onClick={cancelChanges}
-          disabled={!hasPendingChanges && !isEditing}
-        >
-          Cancel Changes
-        </Button>
-        <Button
-          fullWidth={false}
-          className="flex-1"
-          onClick={saveAttendance}
+          onClick={() => {
+            if (hasPendingChanges) {
+              saveAttendance();
+            } else {
+              handleStartNewSession();
+            }
+          }}
           isLoading={saveStatus === "pending"}
-          disabled={!hasPendingChanges}
         >
-          Save Attendance
+          {hasPendingChanges ? "Save Changes" : "Confirm & Finish"}
         </Button>
       </div>
 

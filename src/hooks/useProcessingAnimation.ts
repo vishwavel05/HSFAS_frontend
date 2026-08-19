@@ -55,19 +55,24 @@ export function useProcessingAnimation(active: boolean, isSuccess: boolean) {
     let cancelled = false;
     let rafId: number;
 
-    if (startRef.current === null) {
-      startRef.current = performance.now();
-    }
-
     function tick(now: number) {
       if (cancelled) return;
+
+      if (startRef.current === null) {
+        startRef.current = now;
+      }
 
       if (isSuccess) {
         if (!accelRef.current) {
           accelRef.current = { startTime: now, from: progressRef.current };
         }
         const { startTime, from } = accelRef.current;
-        const t = Math.min(1, (now - startTime) / ACCELERATE_MS);
+        // If the backend finishes instantly (e.g. 50ms), animating from 0 to 100
+        // in 500ms feels like a glitch. Dynamically calculate duration so a full
+        // sweep takes 2.5s minimum to give the illusion of processing, but a tiny
+        // gap from 99% still closes smoothly in 500ms.
+        const duration = Math.max(500, (100 - from) * 25);
+        const t = Math.min(1, (now - startTime) / duration);
         const next = from + (100 - from) * t;
         progressRef.current = next;
         setProgress(next);

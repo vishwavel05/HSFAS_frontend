@@ -4,7 +4,7 @@
 
 html,
 body {
-  height: 100%;
+  /* Restored native body scrolling */
 }
 
 body {
@@ -12,7 +12,7 @@ body {
   color: #0b1e4d;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 640px) {
   body {
     display: flex;
     justify-content: center;

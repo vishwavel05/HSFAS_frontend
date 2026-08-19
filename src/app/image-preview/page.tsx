@@ -59,7 +59,7 @@ function ImagePreviewScreen() {
         onBack={() => router.push("/start-attendance")}
       />
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+      <div className="flex-1 space-y-4 px-5 py-5">
         <Card className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
