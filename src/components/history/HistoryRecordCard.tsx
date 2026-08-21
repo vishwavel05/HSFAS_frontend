@@ -1,8 +1,8 @@
 "use client";
 
-import { AnnotatedImage } from "@/components/result/AnnotatedImage";
 import { cx } from "@/lib/utils";
 import type { AttendanceHistoryRecord } from "@/types/history";
+import Link from "next/link";
 
 function StatusBadge({ status }: { status: string }) {
   const isCompleted = status.toLowerCase() === "completed";
@@ -20,20 +20,12 @@ function StatusBadge({ status }: { status: string }) {
 
 export function HistoryRecordCard({
   record,
-  expanded,
-  onToggle,
 }: {
   record: AttendanceHistoryRecord;
-  expanded: boolean;
-  onToggle: () => void;
 }) {
   return (
     <div className="rounded-2xl border border-surface-border bg-white px-4 py-4">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-start justify-between gap-3 text-left"
-      >
+      <div className="flex w-full items-start justify-between gap-3 text-left">
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-navy">
             {record.course_code} - {record.course_name}
@@ -59,7 +51,7 @@ export function HistoryRecordCard({
             {record.date}
           </span>
         </div>
-      </button>
+      </div>
 
       <div className="mt-3 grid grid-cols-4 gap-2 border-t border-surface-border pt-3 text-center">
         <div>
@@ -80,22 +72,17 @@ export function HistoryRecordCard({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onToggle}
-        className="mt-2.5 flex w-full items-center justify-center gap-1 text-xs font-semibold text-brand-blue"
-      >
-        {expanded ? "Hide annotated images ⌃" : "View annotated images ⌄"}
-      </button>
-
-      {expanded && (
-        <div className="mt-3 border-t border-surface-border pt-3">
-          {/* Reuses the exact same lightbox/zoom component from the
-              Results page — annotated_images here is the same
-              array-of-URL shape, so no new zoom code was needed. */}
-          <AnnotatedImage images={record.annotated_images} />
-        </div>
-      )}
+      <div className="mt-2.5 flex w-full items-center justify-between pt-1">
+        <Link
+          href={`/history/${record.session_id}`}
+          className="flex items-center gap-1 text-xs font-semibold text-brand-blue"
+        >
+          View details
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
+      </div>
     </div>
   );
 }

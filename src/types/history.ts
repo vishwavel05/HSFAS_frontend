@@ -1,3 +1,5 @@
+import type { AttendanceRecord } from "./attendance";
+
 /**
  * Mirrors GET /api/attendance/history/ exactly, per api_documentation.md.
  * Note: the documented example does NOT include a session_id field on
@@ -6,6 +8,7 @@
  * top-of-file comment for what this means for "correct from history".
  */
 export interface AttendanceHistoryRecord {
+  session_id: number;
   course_code: string;
   course_name: string;
   class_group: string;
@@ -17,4 +20,5 @@ export interface AttendanceHistoryRecord {
   absent: number;
   unknown: number;
   annotated_images: string[];
+  attendance?: AttendanceRecord[];
 }

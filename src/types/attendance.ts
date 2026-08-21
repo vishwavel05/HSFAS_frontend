@@ -24,11 +24,20 @@ export interface AttendanceSummary {
   unknown: number;
 }
 
+export interface PendingReviewItem {
+  id: string;
+  student_id: number;
+  display_name: string;
+  similarity: number;
+  image_url: string;
+}
+
 export interface AttendanceResponse {
   session_id: number;
   summary: AttendanceSummary;
   attendance: AttendanceRecord[];
   annotated_images: string[];
+  pending_review?: PendingReviewItem[];
 }
 
 export interface ProcessAttendancePayload {

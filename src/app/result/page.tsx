@@ -10,6 +10,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { SummaryCards } from "@/components/result/SummaryCards";
 import { AnnotatedImage } from "@/components/result/AnnotatedImage";
 import { AttendanceList } from "@/components/result/AttendanceList";
+import { PendingReviewList } from "@/components/result/PendingReviewList";
 import { useAttendanceFlow } from "@/context/AttendanceFlowContext";
 
 function ResultScreen() {
@@ -77,6 +78,10 @@ function ResultScreen() {
             message={saveError ?? "Please try again."}
             onRetry={saveAttendance}
           />
+        )}
+
+        {result.pending_review && result.pending_review.length > 0 && (
+          <PendingReviewList items={result.pending_review} />
         )}
 
         <AttendanceList

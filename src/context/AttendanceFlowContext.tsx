@@ -67,9 +67,10 @@ interface AttendanceFlowContextValue {
 
   // --- Step 5: review & correct ---
   isEditing: boolean;
-  setIsEditing: (editing: boolean) => void;
-  pendingCorrections: Map<number, AttendanceStatus>;
+  setIsEditing: (v: boolean) => void;
+  pendingCorrections: Map<number, "present" | "absent">;
   toggleStatus: (studentId: number) => void;
+  setStudentStatus: (studentId: number, status: "present" | "absent") => void;
   cancelChanges: () => void;
   effectiveAttendance: AttendanceRecord[];
   hasPendingChanges: boolean;
@@ -192,13 +193,9 @@ export function AttendanceFlowProvider({
   // ---- Review / correction state ----
   const result = processMutation.data ?? null;
 
-  const toggleStatus = useCallback((studentId: number) => {
+  const setStudentStatus = useCallback((studentId: number, newStatus: "present" | "absent") => {
     const record = result?.attendance.find((r) => r.student_id === studentId);
     if (!record) return;
-
-    const currentlyPending = pendingCorrections.get(studentId);
-    const currentEffectiveStatus = currentlyPending || record.status;
-    const newStatus = currentEffectiveStatus === "present" ? "absent" : "present";
 
     if (newStatus === "present") {
       toast.custom(
@@ -249,14 +246,25 @@ export function AttendanceFlowProvider({
 
     setPendingCorrections((current) => {
       const next = new Map(current);
-      if (current.has(studentId)) {
-        next.delete(studentId);
+      if (record.status === newStatus) {
+        next.delete(studentId); // Revert to original if same
       } else {
         next.set(studentId, newStatus);
       }
       return next;
     });
-  }, [result, pendingCorrections]);
+  }, [result]);
+
+  const toggleStatus = useCallback((studentId: number) => {
+    const record = result?.attendance.find((r) => r.student_id === studentId);
+    if (!record) return;
+
+    const currentlyPending = pendingCorrections.get(studentId);
+    const currentEffectiveStatus = currentlyPending || record.status;
+    const newStatus = currentEffectiveStatus === "present" ? "absent" : "present";
+
+    setStudentStatus(studentId, newStatus);
+  }, [result, pendingCorrections, setStudentStatus]);
 
   const cancelChanges = useCallback(() => {
     setPendingCorrections(new Map());
@@ -334,6 +342,7 @@ export function AttendanceFlowProvider({
     setIsEditing,
     pendingCorrections,
     toggleStatus,
+    setStudentStatus,
     cancelChanges,
     effectiveAttendance,
     hasPendingChanges: pendingCorrections.size > 0,

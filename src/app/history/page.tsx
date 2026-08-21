@@ -67,7 +67,6 @@ function HistoryScreen() {
   const [courseFilter, setCourseFilter] = useState("All");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   const records = data ?? [];
 
@@ -288,12 +287,6 @@ function HistoryScreen() {
                     <HistoryRecordCard
                       key={key}
                       record={record}
-                      expanded={expandedKey === key}
-                      onToggle={() =>
-                        setExpandedKey((current) =>
-                          current === key ? null : key
-                        )
-                      }
                     />
                   );
                 })}
