@@ -48,6 +48,7 @@ export interface StoredFacultyIdentity {
   facultyId: string;
   fullName: string;
   department: string;
+  gender?: string | null;
 }
 
 export function getStoredFacultyIdentity(): StoredFacultyIdentity | null {

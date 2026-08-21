@@ -5,6 +5,7 @@ import { HindustanLogo, HindustanBadge40 } from "./HindustanBrandmark";
 
 interface AccountMenu {
   onHistory: () => void;
+  onReports: () => void;
   onLogout: () => void;
 }
 
@@ -29,28 +30,36 @@ export function AppHeader({
 
   return (
     <div className="sticky top-0 z-50 bg-navy px-5 pb-5 pt-4 shadow-sm">
-      <div className="flex items-center gap-3">
-        {onBack && (
-          <button
-            aria-label="Go back"
-            onClick={onBack}
-            className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/10"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 18l-6-6 6-6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )}
-        <HindustanLogo className="h-12" />
-        <div className="ml-auto flex items-center gap-2">
-          <HindustanBadge40 className="h-12" />
+      <div className="flex items-center justify-between">
+        {/* Left: Back button (if present) takes up flexible space to push center */}
+        <div className="flex flex-1 justify-start">
+          {onBack && (
+            <button
+              aria-label="Go back"
+              onClick={onBack}
+              className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/10"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M15 18l-6-6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
 
+        {/* Center: Logos perfectly centered */}
+        <div className="flex shrink-0 items-center justify-center gap-4">
+          <HindustanLogo className="h-12" />
+          <HindustanBadge40 className="h-14" />
+        </div>
+
+        {/* Right: Menu (if present) takes up equal flexible space as the left */}
+        <div className="flex flex-1 justify-end">
           {menu && (
             <div className="relative">
               <button
@@ -97,6 +106,32 @@ export function AppHeader({
                         />
                       </svg>
                       History
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        menu.onReports();
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-surface"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M3 3v18h18"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M7 14l4-4 4 4 6-6"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      Reports
                     </button>
                     <button
                       type="button"

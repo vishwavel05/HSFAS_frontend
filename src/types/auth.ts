@@ -13,6 +13,7 @@ export interface AuthUser {
   facultyId: string;
   fullName: string;
   department: string;
+  gender?: string | null;
 }
 
 /**
@@ -26,4 +27,5 @@ export interface LoginResponse {
   faculty_id: string;
   full_name: string;
   department: string;
+  gender?: string | null;
 }

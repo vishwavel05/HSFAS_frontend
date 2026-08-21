@@ -160,12 +160,13 @@ function TimetableScreen() {
         title={
           <>
             {getGreeting()},<br />
-            {user?.fullName?.split(" ")[0] ?? "Faculty"} Ma&apos;am! 👋
+            {user?.fullName?.split(" ")[0] ?? "Faculty"} {user?.gender === "M" ? "Sir" : user?.gender === "F" ? "Ma'am" : ""}! 👋
           </>
         }
         subtitle="Here's your class schedule for today."
         menu={{
           onHistory: () => router.push("/history"),
+          onReports: () => router.push("/reports"),
           onLogout: logout,
         }}
       />

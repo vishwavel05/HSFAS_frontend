@@ -36,6 +36,7 @@ const DEMO_FACULTY: AuthUser = {
   facultyId: "F101",
   fullName: "Demo Faculty",
   department: "CSE",
+  gender: "M",
 };
 // ---------------------------------------------------------------------------
 
@@ -73,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         facultyId: stored.facultyId,
         fullName: stored.fullName,
         department: stored.department,
+        gender: stored.gender,
       });
     }
     setIsHydrated(true);
@@ -85,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         facultyId: data.faculty_id,
         fullName: data.full_name,
         department: data.department,
+        gender: data.gender,
       };
       storeFacultyIdentity(identity, variables.rememberMe);
       setUser(identity);

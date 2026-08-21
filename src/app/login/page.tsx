@@ -70,9 +70,9 @@ export default function LoginPage() {
           </defs>
         </svg>
 
-        <div className="relative flex items-center justify-between pl-14 pr-8 pt-3">
+        <div className="relative flex items-center justify-center gap-4 pt-4">
           <HindustanLogo className="h-14" />
-          <HindustanBadge40 className="h-12" />
+          <HindustanBadge40 className="h-16" />
         </div>
 
         <div className="relative flex flex-col items-center px-6 pb-3 pt-2 text-center">
