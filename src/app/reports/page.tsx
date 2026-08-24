@@ -76,40 +76,48 @@ export default function ReportsPage() {
           <>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white rounded-xl p-4 border border-surface-border shadow-sm flex flex-col min-h-[110px]">
-                <p className="text-[11px] font-bold text-surface-muted uppercase">Total Time Saved</p>
+                <div className="flex items-center gap-1.5 mb-1 text-brand-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  <p className="text-[11px] font-bold text-surface-muted uppercase tracking-wider">Time Saved</p>
+                </div>
                 <p className="text-xl font-extrabold text-navy mt-1">
                   {formatSeconds(data.insights.time_saved.value_seconds)}
                 </p>
-                <p className={`text-[11px] mt-1 ${data.insights.time_saved.trend && data.insights.time_saved.trend >= 0 ? "text-success" : "text-error"}`}>
-                  {data.insights.time_saved.trend && data.insights.time_saved.trend >= 0 ? '↑' : '↓'} 
-                  {Math.abs(data.insights.time_saved.trend || 0).toFixed(1)}% vs previous
-                </p>
               </div>
 
               <div className="bg-white rounded-xl p-4 border border-surface-border shadow-sm flex flex-col min-h-[110px]">
-                <p className="text-[11px] font-bold text-surface-muted uppercase">Avg. Processing Time</p>
+                <div className="flex items-center gap-1.5 mb-1 text-brand-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                  </svg>
+                  <p className="text-[11px] font-bold text-surface-muted uppercase tracking-wider">Avg Time</p>
+                </div>
                 <p className="text-xl font-extrabold text-navy mt-1">
                   {formatSeconds(data.insights.processing_time.value_seconds / (data.insights.total_sessions.value || 1))}
                 </p>
-                <p className={`text-[11px] mt-1 ${data.insights.processing_time.trend && data.insights.processing_time.trend <= 0 ? "text-success" : "text-error"}`}>
-                  {data.insights.processing_time.trend && data.insights.processing_time.trend <= 0 ? '↓' : '↑'} 
-                  {Math.abs(data.insights.processing_time.trend || 0).toFixed(1)}% vs previous
-                </p>
               </div>
 
               <div className="bg-white rounded-xl p-4 border border-surface-border shadow-sm flex flex-col min-h-[110px]">
-                <p className="text-[11px] font-bold text-surface-muted uppercase">Overall Attendance</p>
+                <div className="flex items-center gap-1.5 mb-1 text-brand-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                  </svg>
+                  <p className="text-[11px] font-bold text-surface-muted uppercase tracking-wider">Attendance</p>
+                </div>
                 <p className="text-xl font-extrabold text-navy mt-1">
                   {data.insights.overall_attendance.value_percentage.toFixed(1)}%
                 </p>
-                <p className={`text-[11px] mt-1 ${data.insights.overall_attendance.trend >= 0 ? "text-success" : "text-error"}`}>
-                  {data.insights.overall_attendance.trend >= 0 ? '↑' : '↓'} 
-                  {Math.abs(data.insights.overall_attendance.trend || 0).toFixed(1)}% vs previous
-                </p>
               </div>
 
               <div className="bg-white rounded-xl p-4 border border-surface-border shadow-sm flex flex-col min-h-[110px]">
-                <p className="text-[11px] font-bold text-surface-muted uppercase">Total Sessions</p>
+                <div className="flex items-center gap-1.5 mb-1 text-brand-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                  </svg>
+                  <p className="text-[11px] font-bold text-surface-muted uppercase tracking-wider">Sessions</p>
+                </div>
                 <p className="text-xl font-extrabold text-navy mt-1">
                   {data.insights.total_sessions.value}
                 </p>
@@ -189,7 +197,11 @@ export default function ReportsPage() {
                         <tr key={student.student_id} className="border-b border-surface-border/50 last:border-0">
                           <td className="py-3 px-1 text-navy font-medium">{student.roll_number}</td>
                           <td className="py-3 px-1 text-navy">{student.name}</td>
-                          <td className="py-3 px-1 text-error font-bold text-right">{student.attendance.toFixed(1)}%</td>
+                          <td className={`py-3 px-1 font-bold text-right ${
+                            student.attendance < 60 ? 'text-red-600' : 'text-orange-500'
+                          }`}>
+                            {student.attendance.toFixed(1)}%
+                          </td>
                         </tr>
                       ))}
                     </tbody>
