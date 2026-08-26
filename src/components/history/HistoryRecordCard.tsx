@@ -24,65 +24,49 @@ export function HistoryRecordCard({
   record: AttendanceHistoryRecord;
 }) {
   return (
-    <div className="rounded-2xl border border-surface-border bg-white px-4 py-4">
+    <Link href={`/history/${record.session_id}`} className="block mb-4 transition-transform hover:-translate-y-0.5">
+      <div className="rounded-2xl border border-surface-border border-l-4 border-l-brand-blue bg-white px-4 py-4">
       <div className="flex w-full items-start justify-between gap-3 text-left">
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-navy">
             {record.course_code} - {record.course_name}
           </p>
-          <p className="mt-0.5 text-xs text-surface-muted">
+          <p className="mt-0.5 text-xs text-brand-blue font-semibold">
             {record.class_group}
           </p>
-          <p className="mt-1 flex items-center gap-1 text-xs text-surface-muted">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {record.time}
-          </p>
+          {record.faculty_name && (
+            <p className="mt-0.5 text-[13px] text-surface-muted">
+              By {record.faculty_name}
+            </p>
+          )}
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1.5">
-          <StatusBadge status={record.status} />
-          <span className="flex items-center gap-1 text-xs text-surface-muted">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <rect x="3.5" y="5" width="17" height="15" rx="2" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M3.5 9.5h17M8 3v3M16 3v3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-            {record.date}
-          </span>
+        <div className="flex shrink-0 flex-col items-end">
+          <div className="bg-surface px-2.5 py-1.5 rounded-md flex flex-col items-end">
+            <span className="text-xs font-bold text-navy">{record.date}</span>
+            <span className="text-xs font-semibold text-brand-blue">Period {record.period_number}</span>
+          </div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-4 gap-2 border-t border-surface-border pt-3 text-center">
-        <div>
-          <p className="text-xs text-surface-muted">Total</p>
-          <p className="text-sm font-bold text-navy">{record.total_students}</p>
+      <div className="mt-3 flex items-center justify-between border-t border-surface-border pt-3">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-success"></div>
+            <p className="text-[13px] font-bold text-navy">{record.present} <span className="font-medium text-surface-muted">Present</span></p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-danger"></div>
+            <p className="text-[13px] font-bold text-navy">{record.absent} <span className="font-medium text-surface-muted">Absent</span></p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs text-surface-muted">Present</p>
-          <p className="text-sm font-bold text-success">{record.present}</p>
-        </div>
-        <div>
-          <p className="text-xs text-surface-muted">Absent</p>
-          <p className="text-sm font-bold text-danger">{record.absent}</p>
-        </div>
-        <div>
-          <p className="text-xs text-surface-muted">Unknown</p>
-          <p className="text-sm font-bold text-gold">{record.unknown}</p>
-        </div>
-      </div>
-
-      <div className="mt-2.5 flex w-full items-center justify-between pt-1">
-        <Link
-          href={`/history/${record.session_id}`}
-          className="flex items-center gap-1 text-xs font-semibold text-brand-blue"
-        >
-          View details
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <div className="flex items-center gap-1.5 text-surface-muted">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM18 21a1 1 0 0 0 1-1 7 7 0 0 0-14 0 1 1 0 0 0 1 1h12z" />
           </svg>
-        </Link>
+          <p className="text-[13px] font-bold text-surface-muted">{record.total_students} <span className="font-medium">Total</span></p>
+        </div>
       </div>
     </div>
+    </Link>
   );
 }

@@ -19,13 +19,17 @@ const DEVELOPERS = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { isAuthenticated, isHydrated, user } = useAuth();
 
   useEffect(() => {
     if (isHydrated && isAuthenticated) {
-      router.replace("/start-attendance");
+      if ((user as any)?.isAdmin === true) {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/timetable");
+      }
     }
-  }, [isHydrated, isAuthenticated, router]);
+  }, [isHydrated, isAuthenticated, user, router]);
 
   return (
     <div className="flex flex-1 flex-col bg-navy">

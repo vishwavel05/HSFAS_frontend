@@ -62,7 +62,11 @@ function ResultScreen() {
       />
 
       <div className="flex-1 space-y-5 px-5 py-5">
-        <SummaryCards present={presentCount} absent={absentCount} />
+        <SummaryCards 
+          present={presentCount} 
+          absent={absentCount} 
+          processingTime={result.summary?.processing_time_seconds}
+        />
 
         <AnnotatedImage images={result.annotated_images} />
 

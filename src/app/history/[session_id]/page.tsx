@@ -18,13 +18,14 @@ function HistoryDetailScreen() {
   const sessionId = Number(params.session_id);
   
   const { user } = useAuth();
+  const isAdmin = (user as any)?.isAdmin === true;
   const facultyId = user?.facultyId ?? "";
   
-  // React Query will instantly serve this from cache if we just came from the history page!
+  // React Query will instantly serve this from cache if we just came from the dashboard or history page!
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["attendance-history", facultyId],
-    queryFn: () => getAttendanceHistory(facultyId!),
-    enabled: !!facultyId,
+    queryKey: isAdmin ? ["admin-attendance-history"] : ["attendance-history", facultyId],
+    queryFn: () => getAttendanceHistory(isAdmin ? undefined : facultyId),
+    enabled: isAdmin || !!facultyId,
   });
 
   const record = data?.find((r) => String(r.session_id) === String(params.session_id));
@@ -73,7 +74,7 @@ function HistoryDetailScreen() {
       <AppHeader
         title={record ? `${record.course_code} Details` : "Session Details"}
         subtitle={record ? record.date : ""}
-        onBack={() => router.push("/history")}
+        onBack={() => router.push(isAdmin ? "/admin/dashboard" : "/history")}
       />
 
       <div className="flex-1 overflow-y-auto px-5 py-5">

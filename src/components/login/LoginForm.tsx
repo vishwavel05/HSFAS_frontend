@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 export function LoginForm() {
   const { login, isLoggingIn, loginError, clearLoginError } = useAuth();
@@ -120,12 +121,12 @@ export function LoginForm() {
           checked={rememberMe}
           onChange={(e) => setRememberMe(e.target.checked)}
         />
-        <button
-          type="button"
+        <Link
+          href="/forgot-password"
           className="text-sm font-medium text-brand-blue hover:underline"
         >
           Forgot Password?
-        </button>
+        </Link>
       </div>
 
       {(validationError || loginError) && (

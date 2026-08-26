@@ -75,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fullName: stored.fullName,
         department: stored.department,
         gender: stored.gender,
+        isAdmin: stored.isAdmin,
       });
     }
     setIsHydrated(true);
@@ -84,14 +85,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mutationFn: loginRequest,
     onSuccess: (data, variables) => {
       const identity: AuthUser = {
-        facultyId: data.faculty_id,
-        fullName: data.full_name,
-        department: data.department,
-        gender: data.gender,
+        facultyId: data.faculty.employee_id,
+        fullName: data.faculty.full_name,
+        department: data.faculty.department,
+        gender: data.faculty.gender,
+        isAdmin: data.faculty.is_admin,
       };
       storeFacultyIdentity(identity, variables.rememberMe);
       setUser(identity);
-      router.push("/timetable");
+      if (identity.isAdmin === true) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/timetable");
+      }
     },
   });
 
@@ -110,7 +116,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ) {
           storeFacultyIdentity(DEMO_FACULTY, credentials.rememberMe);
           setUser(DEMO_FACULTY);
-          router.push("/timetable");
+          if (DEMO_FACULTY.isAdmin === true) {
+            router.push("/admin/dashboard");
+          } else {
+            router.push("/timetable");
+          }
         } else {
           setDemoLoginError("Invalid credentials");
         }

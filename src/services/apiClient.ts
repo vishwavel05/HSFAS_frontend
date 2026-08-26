@@ -49,6 +49,7 @@ export interface StoredFacultyIdentity {
   fullName: string;
   department: string;
   gender?: string | null;
+  isAdmin?: boolean;
 }
 
 export function getStoredFacultyIdentity(): StoredFacultyIdentity | null {

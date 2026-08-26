@@ -14,6 +14,7 @@ export interface AuthUser {
   fullName: string;
   department: string;
   gender?: string | null;
+  isAdmin?: boolean;
 }
 
 /**
@@ -23,9 +24,15 @@ export interface AuthUser {
  * of an auth header, so there is nothing to store as a bearer token today.
  */
 export interface LoginResponse {
-  success: true;
-  faculty_id: string;
-  full_name: string;
-  department: string;
-  gender?: string | null;
+  token?: string;
+  access: string;
+  refresh: string;
+  faculty: {
+    id?: number;
+    employee_id: string;
+    full_name: string;
+    department: string;
+    gender?: string | null;
+    is_admin?: boolean;
+  };
 }

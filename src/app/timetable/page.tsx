@@ -164,11 +164,8 @@ function TimetableScreen() {
           </>
         }
         subtitle="Here's your class schedule for today."
-        menu={{
-          onHistory: () => router.push("/history"),
-          onReports: () => router.push("/reports"),
-          onLogout: logout,
-        }}
+        showMenu
+        hideBack
       />
 
       <div className="flex-1 space-y-4 px-5 py-5">
