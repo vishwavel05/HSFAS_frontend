@@ -21,4 +21,6 @@ export interface AttendanceHistoryRecord {
   unknown: number;
   annotated_images: string[];
   attendance?: AttendanceRecord[];
+  faculty_name?: string;
+  period_number?: number;
 }

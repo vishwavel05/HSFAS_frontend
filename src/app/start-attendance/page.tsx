@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import exifr from 'exifr';
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -35,10 +36,80 @@ function StartAttendanceScreen() {
     }
   }, [selectedSlot, router]);
 
-  function handleFiles(fileList: FileList | null) {
+function parseSlotTimeBounds(timeString: string): { start: Date, end: Date } | null {
+  if (!timeString) return null;
+  const parts = timeString.split("-").map(s => s.trim());
+  if (parts.length !== 2) return null;
+  
+  const parseTime = (tStr: string) => {
+    const match = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return null;
+    let [_, h, m, ampm] = match;
+    let hours = parseInt(h, 10);
+    const mins = parseInt(m, 10);
+    if (ampm.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (ampm.toUpperCase() === "AM" && hours === 12) hours = 0;
+    
+    const d = new Date();
+    d.setHours(hours, mins, 0, 0);
+    return d;
+  };
+  
+  const start = parseTime(parts[0]);
+  const end = parseTime(parts[1]);
+  if (!start || !end) return null;
+  return { start, end };
+}
+
+  async function handleFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
     const files = Array.from(fileList);
-    const { accepted, rejected } = addImages(files);
+    
+    const validFiles: { file: File, captureTime?: string }[] = [];
+    const bounds = selectedSlot?.time ? parseSlotTimeBounds(selectedSlot.time) : null;
+    let rejectedByTime = 0;
+    let rejectedByMissingExif = 0;
+
+    for (const file of files) {
+      try {
+        const exifData = await exifr.parse(file, ['DateTimeOriginal']);
+        if (!exifData || !exifData.DateTimeOriginal) {
+          rejectedByMissingExif++;
+          continue;
+        }
+
+        const captureTime = typeof exifData.DateTimeOriginal === 'string' 
+            ? new Date(exifData.DateTimeOriginal) 
+            : exifData.DateTimeOriginal;
+            
+        if (bounds && captureTime instanceof Date && !isNaN(captureTime.getTime())) {
+          const minTime = new Date(bounds.start.getTime() - 15 * 60000);
+          const maxTime = new Date(bounds.end.getTime() + 15 * 60000);
+          
+          if (captureTime < minTime || captureTime > maxTime) {
+            rejectedByTime++;
+            continue;
+          }
+        }
+        
+        const d = captureTime as Date;
+        const formatted = `${d.getFullYear()}:${String(d.getMonth()+1).padStart(2,'0')}:${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        
+        validFiles.push({ file, captureTime: formatted });
+      } catch (e) {
+        rejectedByMissingExif++;
+      }
+    }
+
+    if (rejectedByMissingExif > 0) {
+      alert("One or more photos were rejected because they lack original timestamp data (e.g. screenshots or web downloads). Please use the original photo.");
+    } else if (rejectedByTime > 0) {
+      alert("One or more photos were rejected because they were not taken during the scheduled class period.");
+    }
+
+    if (validFiles.length === 0) return;
+
+    const { accepted, rejected } = addImages(validFiles);
 
     if (rejected > 0) {
       setWarning(

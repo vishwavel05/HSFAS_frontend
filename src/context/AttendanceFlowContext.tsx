@@ -46,12 +46,13 @@ export interface SelectedTimetableSlot {
 interface PickedImage {
   file: File;
   previewUrl: string;
+  captureTime?: string;
 }
 
 interface AttendanceFlowContextValue {
   // --- Step 2/3: image capture ---
   images: PickedImage[];
-  addImages: (files: File[]) => { accepted: number; rejected: number };
+  addImages: (files: { file: File, captureTime?: string }[]) => { accepted: number; rejected: number };
   removeImage: (index: number) => void;
   clearImages: () => void;
 
@@ -103,7 +104,7 @@ export function AttendanceFlowProvider({
   const previewUrlsRef = useRef<string[]>([]);
 
   const addImages = useCallback(
-    (files: File[]) => {
+    (files: { file: File, captureTime?: string }[]) => {
       let accepted = 0;
       let rejected = 0;
       setImages((current) => {
@@ -113,10 +114,10 @@ export function AttendanceFlowProvider({
         rejected = files.length - toAdd.length;
         const next = [
           ...current,
-          ...toAdd.map((file) => {
-            const previewUrl = URL.createObjectURL(file);
+          ...toAdd.map((item) => {
+            const previewUrl = URL.createObjectURL(item.file);
             previewUrlsRef.current.push(previewUrl);
-            return { file, previewUrl };
+            return { file: item.file, previewUrl, captureTime: item.captureTime };
           }),
         ];
         return next;
@@ -168,7 +169,7 @@ export function AttendanceFlowProvider({
       return;
     }
     processMutation.mutate({
-      images: images.map((i) => i.file),
+      images: images.map((i) => ({ file: i.file, captureTime: i.captureTime })),
       timetableSlotId: selectedSlot.timetableSlotId,
       date: selectedSlot.date,
     });
@@ -177,7 +178,7 @@ export function AttendanceFlowProvider({
   const retryProcessing = useCallback(() => {
     if (!selectedSlot) return;
     processMutation.mutate({
-      images: images.map((i) => i.file),
+      images: images.map((i) => ({ file: i.file, captureTime: i.captureTime })),
       timetableSlotId: selectedSlot.timetableSlotId,
       date: selectedSlot.date,
     });

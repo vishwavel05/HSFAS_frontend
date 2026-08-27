@@ -18,7 +18,14 @@ export async function processAttendance(
   payload: ProcessAttendancePayload
 ): Promise<AttendanceResponse> {
   const formData = new FormData();
-  payload.images.forEach((file) => formData.append("images", file));
+  payload.images.forEach((imgObj) => {
+    formData.append("images", imgObj.file);
+    if (imgObj.captureTime) {
+      formData.append("capture_times", imgObj.captureTime);
+    } else {
+      formData.append("capture_times", "MISSING");
+    }
+  });
   formData.append("timetable_slot_id", String(payload.timetableSlotId));
   formData.append("date", payload.date);
   if (payload.threshold !== undefined) {

@@ -25,8 +25,9 @@ export default function AdminDashboardPage() {
         </div>
 
         {isLoading ? (
-          <div className="mt-20">
-            <LoadingSpinner text="Loading recent activity..." />
+          <div className="mt-20 flex flex-col items-center justify-center">
+            <LoadingSpinner />
+            <p className="mt-4 text-sm font-medium text-navy/70">Loading recent activity...</p>
           </div>
         ) : isError ? (
           <div className="mt-10">

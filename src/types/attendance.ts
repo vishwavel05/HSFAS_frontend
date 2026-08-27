@@ -42,7 +42,7 @@ export interface AttendanceResponse {
 }
 
 export interface ProcessAttendancePayload {
-  images: File[];
+  images: { file: File, captureTime?: string }[];
   timetableSlotId: number;
   date: string;
   threshold?: number;
